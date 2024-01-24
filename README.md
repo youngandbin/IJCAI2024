@@ -56,11 +56,7 @@ You can execute the following scripts:
 
 These scripts offer a convenient way to execute the dynamic graph learning models and evaluate the output at once. 
 
-### Visualization
-
-Provide how to generate **figures** that illustrate recommendation performance and investment performance across 7 sub-datasets of our model and baseline models. 
-
-You can replicate the **table** displaying the performance of various methods. To do so, you can refer to the [result.ipynb](https://github.com/young917/MiDaS-B/blob/main/analyze/Performance.ipynb).
+### Data preprocessing
 
 Furthermore, explore our data preprocessing that is available in the [data_prepocess.ipynb](https://github.com/young917/MiDaS-B/blob/main/analyze/PlotDistribution.ipynb).
 
