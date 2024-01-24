@@ -61,6 +61,10 @@ You can execute the following scripts:
 
 These scripts offer a convenient way to execute the dynamic graph learning models and evaluate the output at once. 
 
+* **Recommendation models** : Utilize [run_baseline_rec.sh](https://github.com/youngandbin/IJCAI2024/blob/main/baseline_rec/run_baseline_rec.sh) to run, and utilize [run_baseline_rec_evaluation.sh](https://github.com/youngandbin/IJCAI2024/blob/main/baseline_rec/run_baseline_rec_evaluation.sh) to evaluate recommendation models
+
+* **Stock recommendation models** : Utilize [run_baseline_stock_rec.sh](https://github.com/youngandbin/IJCAI2024/blob/main/baseline_stock_rec/run_baseline_stock_rec.sh) to run, and utilize [run_baseline_stock_rec_evaluation.sh](https://github.com/youngandbin/IJCAI2024/blob/main/baseline_stock_rec/run_baseline_stock_rec_evaluation.sh) to evaluate stock recommendation models
+
 ### Data preprocessing
 
 Furthermore, explore our data preprocessing that is available in the [data_prepocess.ipynb](https://github.com/young917/MiDaS-B/blob/main/analyze/PlotDistribution.ipynb).
