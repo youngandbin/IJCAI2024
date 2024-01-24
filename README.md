@@ -67,5 +67,5 @@ These scripts offer a convenient way to execute the dynamic graph learning model
 
 ### Data preprocessing
 
-Furthermore, explore our data preprocessing that is available in the [data_prepocess.ipynb](https://github.com/young917/MiDaS-B/blob/main/analyze/PlotDistribution.ipynb).
+Furthermore, explore our data preprocessing that is available in the [data_prepocess.ipynb](https://github.com/youngandbin/IJCAI2024/blob/main/data/data_preprocess.ipynb).
 
