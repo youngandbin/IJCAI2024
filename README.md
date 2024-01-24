@@ -16,7 +16,7 @@ While most dynamic methods have not been utilized for recommendation tasks, we a
 (2) **Recommendation models**
 
 Collaborative filtering (CF) algorithms that capture user preferences based on user behaviors. The codes are implemented within the Recbole framework by [Zhao et al, 2021](https://github.com/RUCAIBox/RecBole).
-You can check the code used here in ([baseline_rec]https://github.com/youngandbin/IJCAI2024/tree/main/baseline_rec).
+You can check the code used here in [baseline_rec](https://github.com/youngandbin/IJCAI2024/tree/main/baseline_rec).
 
 * *BPR*: a personalized ranking based recommender.
 * *WMF* : a matrix factorization based recommender.
@@ -27,7 +27,7 @@ You can check the code used here in ([baseline_rec]https://github.com/youngandbi
 (3) **Stock recommendation models**
 
 CF based models that take into account both individual preferences and portfolio diversification. We implement the two most advanced methods with the code used in [Chung et al, 2023](https://arxiv.org/abs/2306.06590).
-You can check the code used here in ([baseline_stock_rec][https://github.com/youngandbin/IJCAI2024/tree/main/baseline_rec](https://github.com/youngandbin/IJCAI2024/tree/main/baseline_stock_rec)).
+You can check the code used here in [baseline_stock_rec](https://github.com/youngandbin/IJCAI2024/tree/main/baseline_stock_rec).
 
 - *two-step method* ([Swezey and Charron, 2018](https://arxiv.org/abs/2103.07768)): ranks items based on user preferences, and then re-ranks them based on the modern portfolio theory (MPT).
 - *MVECF* ([Chung et al, 2023](https://arxiv.org/abs/2306.06590)): uses a ranking loss function based on the MPT into a matrix factorization model.
