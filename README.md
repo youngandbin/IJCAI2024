@@ -9,9 +9,9 @@ We provide source code for (1) Dynamic graph learning models (including our mode
 While most dynamic methods have not been utilized for recommendation tasks, we adapt their original architectures to recommendation task by incorporating negative sampling during training and applying BPR loss. The codes are implemented within the temporal graph network (TGN) framework by [Rossi et al, 2020](https://github.com/twitter-research/tgn). 
 
 * **PfoTGNRec**: Our proposed model based on TGN that incorporates diversification-enhancing contrastive learning.
-* *DyRep* ([Trivedi et al., 2019]()): 
-* *Jodie* ([Kumar et al., 2018]()): 
-* *TGAT* ([Xu et al., 2020]()): incorporates a time encoding technique upon GAT which is a graph attention mechanism applied to static graphs. 
+* *DyRep* ([Trivedi et al., 2019](https://openreview.net/forum?id=HyePrhR5KX)): learns representation over dynamic graphs as latent hidden process bridging two observed processes of Topological Evolution of and Interactions on dynamic graphs.
+* *Jodie* ([Kumar et al., 2018](https://arxiv.org/abs/1908.01207)): models the future trajectory of nodes in an embedding space to predict user-item interactions in dynamic scenarios. 
+* *TGAT* ([Xu et al., 2020](https://arxiv.org/abs/2002.07962)): incorporates a novel time encoding technique upon GAT which is a graph attention mechanism applied to static graphs. 
 
 (2) **Recommendation models**
 
@@ -27,7 +27,7 @@ Collaborative filtering (CF) algorithms that capture user preferences based on u
 
 CF based models that take into account both individual preferences and portfolio diversification. We implement the two most advanced methods with the code used in [Chung et al, 2023](https://arxiv.org/abs/2306.06590).
 
-- *two-step method* ([Swezey and Charron, 2018]()): ranks items based on user preferences, and then re-ranks them based on the modern portfolio theory (MPT).
+- *two-step method* ([Swezey and Charron, 2018](https://arxiv.org/abs/2103.07768)): ranks items based on user preferences, and then re-ranks them based on the modern portfolio theory (MPT).
 - *MVECF* ([Chung et al, 2023](https://arxiv.org/abs/2306.06590)): uses a ranking loss function based on the MPT into a matrix factorization model.
 
 - - -
@@ -40,19 +40,19 @@ In the paper, we used mock trading dataset obtained from a stock trading platfor
 
 ## How to Run
 
-The experiment was conducted on `Python 3.10.11` and packages listed in [requirements.txt](https://github.com/young917/MiDaS-B/blob/main/run/run_midas_oracle.sh).
+The experiment was conducted on `Python 3.10.11` and packages listed in [requirements.txt](https://github.com/youngandbin/IJCAI2024/blob/main/requirements.txt).
 
 You can execute the following scripts:
 
-* **DyRep**: Utilize [run_dyrep.sh](https://github.com/young917/MiDaS-B/blob/main/run/run_midas_oracle.sh) to run DyRep model.
+* **DyRep**: Utilize [run_dyrep.sh](https://github.com/youngandbin/IJCAI2024/blob/main/run/run_dyrep.sh) to run DyRep model.
 
-* **Jodie**: Utilize [run_jodie.sh](https://github.com/young917/MiDaS-B/blob/main/run/run_midas_oracle.sh) to run Jodie model.
+* **Jodie**: Utilize [run_jodie.sh](https://github.com/youngandbin/IJCAI2024/blob/main/run/run_jodie.sh) to run Jodie model.
 
-* **TGAT**: Utilize [run_tgat.sh](https://github.com/young917/MiDaS-B/blob/main/run/run_midas_oracle.sh) to run Jodie model.
+* **TGAT**: Utilize [run_tgat.sh](https://github.com/youngandbin/IJCAI2024/blob/main/run/run_tgat.sh) to run Jodie model.
 
-* **PfoTGNRec**: For our proposed method, PfoTGNRec, execute [run_ours.sh](https://github.com/young917/MiDaS-B/blob/main/run/run_midasB.sh)
+* **PfoTGNRec**: For our proposed method, PfoTGNRec, execute [run_ours.sh](https://github.com/youngandbin/IJCAI2024/blob/main/run/run_ours.sh)
 
-* **PfoTGNRec w. hyperparameters**: If you wish to run our model with hyperparameter tuning, use [run_ours_hyper.sh](https://github.com/young917/MiDaS-B/blob/main/run/run_midasB_oracle.sh)
+* **PfoTGNRec w. hyperparameters**: If you wish to run our model with hyperparameter tuning, use [run_ours_hyper.sh](https://github.com/youngandbin/IJCAI2024/blob/main/run/run_ours_hyper.sh)
 
 These scripts offer a convenient way to execute the dynamic graph learning models and evaluate the output at once. 
 
