@@ -99,6 +99,128 @@ class TGN(torch.nn.Module):
                                                  n_neighbors=self.n_neighbors)
 
 
+  def compute_temporal_embeddings_p(self, source_nodes, destination_nodes, p_pos_nodes, p_neg_nodes, neg_nodes,
+                                    edge_times, edge_idxs, n_neighbors=20):
+    """
+    Compute temporal embeddings for sources, destinations, and negatively sampled destinations.
+
+    :param source_nodes [batch_size]: source ids.
+    :param destination_nodes [batch_size]: destination ids
+    :param negative_nodes [batch_size]: ids of negative sampled destination
+    :param edge_times [batch_size]: timestamp of interaction
+    :param edge_idxs [batch_size]: index of interaction
+    :param n_neighbors [scalar]: number of temporal neighbor to consider in each convolutional
+    layer
+    :return: Temporal embeddings for sources, destinations and negatives
+    """
+
+    NUM_NEG_TRAIN = int(p_neg_nodes.shape[0]/source_nodes.shape[0])
+
+    n_samples = len(source_nodes)
+    nodes = np.concatenate([source_nodes, destination_nodes, p_pos_nodes, p_neg_nodes, neg_nodes])
+    positives = np.concatenate([source_nodes, destination_nodes])
+    edge_times_duplicated = [x for x in edge_times for _ in range(NUM_NEG_TRAIN)]
+    timestamps = np.concatenate([edge_times, edge_times, edge_times_duplicated, edge_times_duplicated, edge_times_duplicated])
+
+    """
+    1. Memory update (RNN module)
+    """
+
+    # Even when moving to the next batch, the TGN memory retains the memory from the previous batch
+    memory = None
+    time_diffs = None
+    if self.use_memory:
+      if self.memory_update_at_start:
+        # Update memory for all nodes with messages stored in previous batches ( s = RNN(m, s-) )
+        memory, last_update = self.get_updated_memory(list(range(self.n_nodes)),
+                                                      self.memory.messages) # Dictionary where the keys are node IDs and the values are messages
+
+      else: # not executed
+        memory = self.memory.get_memory(list(range(self.n_nodes)))
+        last_update = self.memory.last_update
+
+      ### Compute differences between the time the memory of a node was last updated,
+      ### and the time for which we want to compute the embedding of a node
+      source_time_diffs = torch.LongTensor(edge_times).to(self.device) - last_update[source_nodes].long()
+      source_time_diffs = (source_time_diffs - self.mean_time_shift_src) / self.std_time_shift_src
+      destination_time_diffs = torch.LongTensor(edge_times).to(self.device) - last_update[destination_nodes].long()
+      destination_time_diffs = (destination_time_diffs - self.mean_time_shift_dst) / self.std_time_shift_dst
+      p_pos_time_diffs = torch.LongTensor(edge_times_duplicated).to(self.device) - last_update[p_pos_nodes].long()
+      p_pos_time_diffs = (p_pos_time_diffs - self.mean_time_shift_dst) / self.std_time_shift_dst
+      p_neg_time_diffs = torch.LongTensor(edge_times_duplicated).to(self.device) - last_update[p_neg_nodes].long()
+      p_neg_time_diffs = (p_neg_time_diffs - self.mean_time_shift_dst) / self.std_time_shift_dst
+      neg_time_diffs = torch.LongTensor(edge_times_duplicated).to(self.device) - last_update[neg_nodes].long()
+      neg_time_diffs = (neg_time_diffs - self.mean_time_shift_dst) / self.std_time_shift_dst
+      time_diffs = torch.cat([source_time_diffs, destination_time_diffs, p_pos_time_diffs, p_neg_time_diffs, neg_time_diffs], dim=0)
+
+
+    """
+    2. Embedding (GNN module)
+    """
+    
+    # Compute the embeddings using the embedding module 
+    # shape: torch.Size([3*bs, dim]) # bs (batch size) for each source, destination, and negative samples respectively.
+    node_embedding = self.embedding_module.compute_embedding(memory=memory,
+                                                             source_nodes=nodes,
+                                                             timestamps=timestamps,
+                                                             n_layers=self.n_layers,
+                                                             n_neighbors=n_neighbors,
+                                                             time_diffs=time_diffs) 
+
+    source_node_embedding = node_embedding[:n_samples]
+    destination_node_embedding = node_embedding[n_samples : 2 * n_samples]
+    p_pos_node_embedding = node_embedding[2 * n_samples : (2+NUM_NEG_TRAIN) * n_samples]
+    p_neg_node_embedding = node_embedding[(2+NUM_NEG_TRAIN) * n_samples : (2+2*NUM_NEG_TRAIN) * n_samples]
+    neg_node_embedding = node_embedding[(2+2*NUM_NEG_TRAIN) * n_samples :]
+
+    """
+    3. Raw message store
+    """
+    
+    if self.use_memory:
+      if self.memory_update_at_start:
+        # Persist the updates to the memory only for sources and destinations 
+        # (since now we have new messages for them)
+        # assign values to self.memory
+        self.update_memory(positives, self.memory.messages) # s = RNN(m, s-)
+
+        # Check if two tensors are identical.
+        assert torch.allclose(memory[positives], self.memory.get_memory(positives), atol=1e-5), \
+          "Something wrong in how the memory was updated"
+
+        # Remove messages for the positives since we have already updated the memory using them
+        self.memory.clear_messages(positives)
+
+      unique_sources, source_id_to_messages = self.get_raw_messages(source_nodes,
+                                                                    source_node_embedding,
+                                                                    destination_nodes,
+                                                                    destination_node_embedding,
+                                                                    edge_times, edge_idxs)
+      unique_destinations, destination_id_to_messages = self.get_raw_messages(destination_nodes,
+                                                                              destination_node_embedding,
+                                                                              source_nodes,
+                                                                              source_node_embedding,
+                                                                              edge_times, edge_idxs)
+
+      if self.memory_update_at_start: 
+        self.memory.store_raw_messages(unique_sources, source_id_to_messages)
+        self.memory.store_raw_messages(unique_destinations, destination_id_to_messages)
+      else: # not executed
+        self.update_memory(unique_sources, source_id_to_messages)
+        self.update_memory(unique_destinations, destination_id_to_messages)
+
+      if self.dyrep:
+        source_node_embedding = memory[source_nodes]
+        destination_node_embedding = memory[destination_nodes]
+        p_pos_node_embedding = memory[p_pos_nodes]
+        p_neg_node_embedding = memory[p_neg_nodes]
+        neg_node_embedding = memory[neg_nodes]
+
+    return source_node_embedding, destination_node_embedding, p_pos_node_embedding, p_neg_node_embedding, neg_node_embedding
+
+
+
+
   def compute_temporal_embeddings(self, source_nodes, destination_nodes, p_neg_nodes, 
                                         edge_times, edge_idxs, n_neighbors=20):
     """
