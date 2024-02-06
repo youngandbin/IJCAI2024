@@ -2,6 +2,8 @@
 
 The tricky point in stock recommendation is that recommendations should give good investment performance but also should not ignore individual preferences. To tackle this challenge, we propose **PfoTGNRec**, which can handle time-varying collaborative signals and incorporates diversification-enhancing contrastive learning. 
 
+![model](assets/model.pdf)
+
 We provide source code for (1) Dynamic graph learning models (including our model), (2) Recommendation models, and (3) Stock recommendation models.  
 
 (1) **Dynamic graph learning models**
